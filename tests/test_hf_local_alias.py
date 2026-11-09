@@ -29,8 +29,11 @@ class AliasTestCase(unittest.TestCase):
 
 
 class AliasesFileTest(unittest.TestCase):
-    def test_no_aliases_are_registered_by_default(self) -> None:
-        self.assertEqual(DATASET_ALIASES, {})
+    def test_aliases_map_short_ids_to_location_strings(self) -> None:
+        for alias, location in DATASET_ALIASES.items():
+            self.assertIsInstance(alias, str)
+            self.assertIsInstance(location, str)
+            self.assertNotIn("/", alias)
 
 
 class SplitAliasAndFragmentTest(AliasTestCase):

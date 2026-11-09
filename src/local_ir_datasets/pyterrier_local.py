@@ -13,14 +13,17 @@ from .aliases import resolve_alias
 
 def _v2_id(dataset: str) -> str:
     """Normalize ``dataset`` to a stable ``ir_datasets.v2`` id: an alias
-    (``<alias>[/fragment]``) becomes ``hf-local:<absolute location>[/fragment]``;
+    (``<alias>[/fragment]``) becomes ``hf-local:<absolute location>[/fragment]``
+    (or ``tira-local:`` for a TIRA-format directory without a ``README.md``);
     anything else is passed through unchanged (``hf-local:...``, ``irds:...``)."""
     aliased = resolve_alias(dataset)
     if aliased is None:
         return dataset
     location, fragment = aliased
-    spec = str(Path(location).resolve())
-    return f"hf-local:{spec}/{fragment}" if fragment else f"hf-local:{spec}"
+    resolved = Path(location).resolve()
+    scheme = "hf-local" if (resolved / "README.md").is_file() else "tira-local"
+    spec = f"{scheme}:{resolved}"
+    return f"{spec}/{fragment}" if fragment else spec
 
 
 def load_pyterrier_dataset(dataset: str):
@@ -34,9 +37,10 @@ def load_pyterrier_dataset(dataset: str):
     import ir_datasets.v2
     import pyterrier as pt
 
-    from . import hf_local_provider
+    from . import hf_local_provider, tira_local_provider
 
     hf_local_provider.register()
+    tira_local_provider.register()
     v2_id = _v2_id(dataset)
     node = ir_datasets.v2.load(v2_id)
 

@@ -91,7 +91,23 @@ Both mechanisms are workarounds until `ir_datasets` supports local `hf:` repos n
 
 ## TIRA-format directories
 
-A directory with `queries.jsonl`, `corpus.jsonl.gz` (or `documents.jsonl[.gz]`) and optionally `qrels.txt` (see [`tests/resources/example-tira-dataset`](tests/resources/example-tira-dataset)) can be loaded directly with `tira`:
+A directory with `queries.jsonl`, `corpus.jsonl.gz` (or `documents.jsonl[.gz]`) and optionally `qrels.txt` (see [`tests/resources/example-tira-dataset`](tests/resources/example-tira-dataset)) can be loaded in two ways.
+
+### `tira-local:` provider (`ir_datasets.v2`)
+
+Works like `hf-local:` (same `<path-or-alias>[/fragment]` addressing; fragments `docs`, `queries`, `qrels`) and needs neither `tira` nor network access:
+
+```python
+import ir_datasets.v2
+import local_ir_datasets  # registers "hf-local:" and "tira-local:"
+
+benchmark = ir_datasets.v2.load("tira-local:tests/resources/example-tira-dataset")
+docs = ir_datasets.v2.load("tira-local:tests/resources/example-tira-dataset/docs")
+```
+
+It exposes the directory through a generated `hf:` card in `<IR_DATASETS_HOME>/local-ir-datasets/tira-local/` (the corpus and queries are symlinked; `qrels.txt` is converted to `qrels.jsonl`).
+
+### With `tira`
 
 ```python
 from tira.third_party_integrations import ir_datasets
@@ -102,7 +118,7 @@ docs, queries, qrels = dataset.docs_iter(), dataset.queries_iter(), dataset.qrel
 
 ## Dataset aliases
 
-`src/local_ir_datasets/aliases.py` holds `DATASET_ALIASES`, a dictionary from short dataset ids to locations. It is empty by default. Add entries to use short ids:
+`src/local_ir_datasets/aliases.py` holds `DATASET_ALIASES`, a dictionary from short dataset ids to locations. Add entries to use short ids:
 
 ```python
 DATASET_ALIASES = {"pangrams": "tests/resources/example-hf-dataset"}

@@ -51,35 +51,37 @@ def _repo_id_for(local_dir: Path) -> str:
     return f"local/{digest}"
 
 
-def _split_path_and_fragment(spec: str) -> Tuple[Path, Optional[str]]:
+def _split_path_and_fragment(
+    spec: str, marker: str = "README.md", scheme: str = "hf-local"
+) -> Tuple[Path, Optional[str]]:
     """``<path>[/fragment]`` -> ``(resolved directory, fragment or None)``.
 
     Tries ``spec`` as ``<alias>[/fragment]`` (see
     :mod:`local_ir_datasets.aliases`) first, then the whole ``spec`` as a
-    directory (containing a ``README.md``); only if that fails is its last
+    directory (containing the ``marker`` file); only if that fails is its last
     ``/``-segment peeled off and tried as a fragment,
     with the remainder re-checked the same way. Raises
     ``KeyError`` if neither works -- becomes "no such node" at
     ``ManifestProvider.__getitem__``, exactly like an unannotated ``hf:``
-    repo does.
+    repo does. ``marker`` and ``scheme`` let ``tira-local:`` reuse this.
     """
     aliased = resolve_alias(spec)
     if aliased is not None:
         location, fragment = aliased
-        if (Path(location) / "README.md").is_file():
+        if (Path(location) / marker).is_file():
             return Path(location).resolve(), fragment
-        raise KeyError(f"hf-local:{spec}: alias location {location} has no README.md")
+        raise KeyError(f"{scheme}:{spec}: alias location {location} has no {marker}")
     candidate = Path(spec)
-    if (candidate / "README.md").is_file():
+    if (candidate / marker).is_file():
         return candidate.resolve(), None
     if "/" in spec:
         parent, _, fragment = spec.rpartition("/")
         parent_path = Path(parent)
-        if (parent_path / "README.md").is_file():
+        if (parent_path / marker).is_file():
             return parent_path.resolve(), fragment
     raise KeyError(
-        f"hf-local:{spec}: not a known dataset alias, and neither {candidate} nor a "
-        f"fragment split off its last path segment is a directory containing a README.md. "
+        f"{scheme}:{spec}: not a known dataset alias, and neither {candidate} nor a "
+        f"fragment split off its last path segment is a directory containing a {marker}. "
         f"{known_aliases_hint()}"
     )
 
