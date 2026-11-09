@@ -109,6 +109,19 @@ local_ir_datasets.load_tira("apples")           # TIRA-format directory
 
 Aliases take precedence over paths. `load_tira` also accepts plain paths. An id that is neither an alias nor an existing directory raises an error that lists the known aliases (`aliases.resolve_location(dataset, fail_if_not_found=True)`). The tests patch the dictionary temporarily.
 
+## PyTerrier
+
+`load_pyterrier_dataset` loads a dataset with `ir_datasets.v2` and returns the matching `pt.datasets.get_dataset(...)` object. It accepts an alias or any v2 id such as `hf-local:<path>[/fragment]`:
+
+```python
+from local_ir_datasets import load_pyterrier_dataset
+
+dataset = load_pyterrier_dataset("pangrams")   # alias, or "hf-local:<path>"
+topics = dataset.get_topics()                  # qid, query
+qrels = dataset.get_qrels()                    # qid, docno, label
+docs = dataset.get_corpus_iter()               # dicts with docno, text
+```
+
 ## Development
 
-Use the dev container (see `AGENTS.md`); run `pytest`.
+Use the dev container (see `AGENTS.md`); it includes Java, PyTerrier, `ir_measures` and `tira`, so the PyTerrier tests run there. Run `pytest`.

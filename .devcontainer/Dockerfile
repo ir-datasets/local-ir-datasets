@@ -4,7 +4,10 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
+    default-jdk-headless \
     && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/default-java
 
 RUN pip install --no-cache-dir --upgrade pip
 
@@ -16,5 +19,11 @@ RUN pip install --no-cache-dir "huggingface_hub" "datasets"
 
 # Kept in sync with pyproject.toml's [project.optional-dependencies].test.
 RUN pip install --no-cache-dir "coverage[toml]>=7.6" "pytest>=8.3" "tira"
+
+# PyTerrier (needs the JDK above) and ir_measures, so retrieval/indexing tests
+# run on the local datasets. The Terrier jars are fetched once here so tests
+# don't need network access.
+RUN pip install --no-cache-dir "python-terrier" "ir_measures" \
+    && python -c "import pyterrier as pt; pt.java.init()"
 
 WORKDIR /workspaces/local-ir-datasets

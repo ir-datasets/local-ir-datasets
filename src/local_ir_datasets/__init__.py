@@ -7,9 +7,10 @@ to a local directory.
 """
 from . import hf_local_provider as _hf_local_provider
 from .hf_local import local_hf_repo
+from .pyterrier_local import load_pyterrier_dataset
 from .tira_local import load_tira
 
 # Idempotent; no-op if ir_datasets isn't installed.
 _hf_local_provider.register()
 
-__all__ = ["local_hf_repo", "load_tira"]
+__all__ = ["local_hf_repo", "load_pyterrier_dataset", "load_tira"]

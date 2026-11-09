@@ -17,6 +17,8 @@ test = [
   "coverage[toml]>=7.6",
   "pytest>=8.3",
   "tira",
+  "python-terrier",
+  "ir_measures",
 ]
 
 [tool.setuptools]
