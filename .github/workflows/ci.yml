@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "git+https://github.com/ir-datasets/ir-datasets.git@07a9ad7eddbfb5c701c716ed815fd0b7b4003708" huggingface_hub datasets
+          python -m pip install .[test]
+      - name: Run tests with coverage
+        run: python -m coverage run -m pytest && python -m coverage report -m

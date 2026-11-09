@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local-ir-datasets"
+version = "0.1.0"
+description = "ir_datasets provider for locally provided datasets."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name = "local-ir-datasets contributors" }
+]
+
+[project.optional-dependencies]
+test = [
+  "coverage[toml]>=7.6",
+  "pytest>=8.3",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["local_ir_datasets"]
+
+[tool.coverage.report]
+show_missing = true

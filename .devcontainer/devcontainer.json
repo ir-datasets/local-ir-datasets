@@ -1,0 +1,11 @@
+{
+  "name": "local-ir-datasets",
+  "build": { "dockerfile": "Dockerfile" },
+  "workspaceFolder": "/workspaces/local-ir-datasets",
+  "postStartCommand": "pip install --no-deps -e .",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
