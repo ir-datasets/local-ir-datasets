@@ -117,24 +117,14 @@ def _resolve(spec: str):
     return hf_local_provider._resolve(f"{card_dir}/{fragment}" if fragment else str(card_dir))
 
 
-_registered = False
-
-
-def register() -> None:
-    """Register the ``tira-local`` provider with ``ir_datasets.v2``'s default
-    graph, once per process. Safe to call repeatedly; does nothing if
-    ``ir_datasets`` isn't installed."""
-    global _registered
-    if _registered:
-        return
-    try:
-        from ir_datasets.v2.base import Generator, Param
-        from ir_datasets.v2.graph import default_graph
-        from ir_datasets.v2.nodes import TABLE
-        from ir_datasets.v2.registry import ManifestProvider
-    except ImportError:
-        return
-
+provider = None
+try:
+    from ir_datasets.v2.base import Generator, Param
+    from ir_datasets.v2.nodes import TABLE
+    from ir_datasets.v2.registry import ManifestProvider
+except ImportError:  # ir_datasets is optional; the provider is then simply unavailable
+    pass
+else:
     provider = ManifestProvider("tira-local")
     provider.register_generator(
         Generator(
@@ -146,8 +136,14 @@ def register() -> None:
         ),
         module=__name__,
     )
+
+
+def register() -> None:
+    """Add the ``tira-local`` provider to ``ir_datasets.v2``'s default graph.
+    Installed packages get this through the ``ir_datasets.providers`` entry
+    point; calling it is only needed when running from a source tree.
+    Idempotent; does nothing if ``ir_datasets`` isn't installed."""
+    if provider is None:
+        return
+    from ir_datasets.v2.graph import default_graph
     default_graph().add(provider)
-    _registered = True
-
-
-register()

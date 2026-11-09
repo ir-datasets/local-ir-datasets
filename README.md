@@ -52,11 +52,11 @@ A complete example is in [`tests/resources/example-hf-dataset`](tests/resources/
 
 ### 2. Load it
 
-Importing `local_ir_datasets` registers the `hf-local:` provider:
+Installing the package registers the `hf-local:` and `tira-local:` providers through the `ir_datasets.providers` entry point, so no import is needed:
 
 ```python
 import ir_datasets.v2
-import local_ir_datasets  # registers "hf-local:"
+# no `import local_ir_datasets` required
 
 # The whole benchmark (the card's default entry)
 benchmark = ir_datasets.v2.load("hf-local:tests/resources/example-hf-dataset")
@@ -99,7 +99,7 @@ Works like `hf-local:` (same `<path-or-alias>[/fragment]` addressing; fragments 
 
 ```python
 import ir_datasets.v2
-import local_ir_datasets  # registers "hf-local:" and "tira-local:"
+# providers are discovered via entry points
 
 benchmark = ir_datasets.v2.load("tira-local:tests/resources/example-tira-dataset")
 docs = ir_datasets.v2.load("tira-local:tests/resources/example-tira-dataset/docs")

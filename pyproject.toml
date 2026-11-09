@@ -24,6 +24,10 @@ test = [
   "ir_measures",
 ]
 
+[project.entry-points."ir_datasets.providers"]
+hf-local = "local_ir_datasets.hf_local_provider:provider"
+tira-local = "local_ir_datasets.tira_local_provider:provider"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 

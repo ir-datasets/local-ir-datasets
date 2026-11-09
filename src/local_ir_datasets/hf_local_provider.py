@@ -97,41 +97,33 @@ def _resolve(spec: str):
     return hfm._HfResolver(hf_spec)
 
 
-_registered = False
-
-
-def register() -> None:
-    """Register the ``hf-local`` provider with ``ir_datasets.v2``'s default
-    graph, once per process. Safe to call repeatedly. Does nothing if
-    ``ir_datasets`` isn't installed, matching this project's usual
-    "silently skipped" convention for the optional dependency."""
-    global _registered
-    if _registered:
-        return
-    try:
-        from ir_datasets.v2.base import Generator, Param
-        from ir_datasets.v2.graph import default_graph
-        from ir_datasets.v2.nodes import TABLE
-        from ir_datasets.v2.registry import ManifestProvider
-    except ImportError:
-        return
-
+provider = None
+try:
+    from ir_datasets.v2.base import Generator, Param
+    from ir_datasets.v2.nodes import TABLE
+    from ir_datasets.v2.registry import ManifestProvider
+except ImportError:  # ir_datasets is optional; the provider is then simply unavailable
+    pass
+else:
     provider = ManifestProvider("hf-local")
     provider.register_generator(
         Generator(
             "{spec}",
             params={"spec": Param(pattern=r".+")},
-            # Descriptive only (see hf_provider's own identical generator):
-            # the actual produced type varies between a per-entity table and
-            # a Benchmark, depending on what's requested.
             type=TABLE,
             resolver=_resolve,
             enumerable=False,
         ),
         module=__name__,
     )
+
+
+def register() -> None:
+    """Add the ``hf-local`` provider to ``ir_datasets.v2``'s default graph.
+    Installed packages get this through the ``ir_datasets.providers`` entry
+    point; calling it is only needed when running from a source tree.
+    Idempotent; does nothing if ``ir_datasets`` isn't installed."""
+    if provider is None:
+        return
+    from ir_datasets.v2.graph import default_graph
     default_graph().add(provider)
-    _registered = True
-
-
-register()
