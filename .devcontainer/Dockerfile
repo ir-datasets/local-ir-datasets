@@ -15,6 +15,6 @@ RUN pip install --no-cache-dir "git+https://github.com/ir-datasets/ir-datasets.g
 RUN pip install --no-cache-dir "huggingface_hub" "datasets"
 
 # Kept in sync with pyproject.toml's [project.optional-dependencies].test.
-RUN pip install --no-cache-dir "coverage[toml]>=7.6" "pytest>=8.3"
+RUN pip install --no-cache-dir "coverage[toml]>=7.6" "pytest>=8.3" "tira"
 
 WORKDIR /workspaces/local-ir-datasets

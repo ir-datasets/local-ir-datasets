@@ -38,6 +38,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from . import hf_local
+from .aliases import known_aliases_hint, resolve_alias
 
 
 def _repo_id_for(local_dir: Path) -> str:
@@ -53,13 +54,21 @@ def _repo_id_for(local_dir: Path) -> str:
 def _split_path_and_fragment(spec: str) -> Tuple[Path, Optional[str]]:
     """``<path>[/fragment]`` -> ``(resolved directory, fragment or None)``.
 
-    Tries the whole ``spec`` as a directory (containing a ``README.md``)
-    first; only if that fails is its last ``/``-segment peeled off and tried
-    as a fragment, with the remainder re-checked the same way. Raises
+    Tries ``spec`` as ``<alias>[/fragment]`` (see
+    :mod:`local_ir_datasets.aliases`) first, then the whole ``spec`` as a
+    directory (containing a ``README.md``); only if that fails is its last
+    ``/``-segment peeled off and tried as a fragment,
+    with the remainder re-checked the same way. Raises
     ``KeyError`` if neither works -- becomes "no such node" at
     ``ManifestProvider.__getitem__``, exactly like an unannotated ``hf:``
     repo does.
     """
+    aliased = resolve_alias(spec)
+    if aliased is not None:
+        location, fragment = aliased
+        if (Path(location) / "README.md").is_file():
+            return Path(location).resolve(), fragment
+        raise KeyError(f"hf-local:{spec}: alias location {location} has no README.md")
     candidate = Path(spec)
     if (candidate / "README.md").is_file():
         return candidate.resolve(), None
@@ -69,8 +78,9 @@ def _split_path_and_fragment(spec: str) -> Tuple[Path, Optional[str]]:
         if (parent_path / "README.md").is_file():
             return parent_path.resolve(), fragment
     raise KeyError(
-        f"hf-local:{spec}: neither {candidate} nor a fragment split off its last "
-        f"path segment is a directory containing a README.md"
+        f"hf-local:{spec}: not a known dataset alias, and neither {candidate} nor a "
+        f"fragment split off its last path segment is a directory containing a README.md. "
+        f"{known_aliases_hint()}"
     )
 
 
