@@ -13,7 +13,9 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 #: alias -> location of the dataset directory. Empty by default.
-DATASET_ALIASES: Dict[str, str] = {}
+DATASET_ALIASES: Dict[str, str] = {
+    "trec28-misinfo": "/mnt/corpora/trec-28-misinfo-20251008_1"
+}
 
 
 def resolve_alias(spec: str) -> Optional[Tuple[str, Optional[str]]]:
