@@ -4,6 +4,13 @@ This is an ir_datasets provider that manages access to locally provided datasets
 
 One application of this provider is to use it with a small set of corpora as part of an IR course.
 
+## Installation
+
+```bash
+pip install .          # core (ir_datasets v2 and huggingface_hub/datasets are expected to be installed)
+pip install ".[full]"  # additionally installs tira
+```
+
 ## `hf-local:` provider
 
 `hf-local:` loads a dataset from a local directory through `ir_datasets.v2`, with no network access and no Hugging Face Hub repo. It reuses the real `hf:` card parsing and file reading, so a directory that works here also works as a published `hf:` dataset.

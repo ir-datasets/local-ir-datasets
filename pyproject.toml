@@ -13,10 +13,13 @@ authors = [
 ]
 
 [project.optional-dependencies]
+full = [
+  "tira",
+]
 test = [
   "coverage[toml]>=7.6",
   "pytest>=8.3",
-  "tira",
+  "local-ir-datasets[full]",
   "python-terrier",
   "ir_measures",
 ]
